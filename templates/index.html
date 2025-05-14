@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Booking Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f6f8fc 0%, #e9f0f7 100%);
+        }
+        .chat-container {
+            height: calc(100vh - 300px);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            scrollbar-width: thin;
+            scrollbar-color: #6366f1 #f3f4f6;
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: #6366f1;
+            border-radius: 3px;
+        }
+        .message {
+            max-width: 80%;
+            margin: 8px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            animation: messageSlide 0.3s ease-out;
+            position: relative;
+        }
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .user-message {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        .bot-message {
+            background: white;
+            color: #1f2937;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e5e7eb;
+        }
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+        }
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 18px;
+            margin: 8px;
+            width: fit-content;
+            border: 1px solid #e5e7eb;
+        }
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #6366f1;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        .header-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .input-container {
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 1rem;
+        }
+        .input-field {
+            transition: all 0.3s ease;
+            padding-right: 3rem;
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .send-button {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        }
+        .send-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+        }
+        .send-button:active {
+            transform: translateY(0);
+        }
+        .chat-card {
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            background: white;
+        }
+        .quick-replies {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .quick-replies::-webkit-scrollbar {
+            display: none;
+        }
+        .quick-reply {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .quick-reply:hover {
+            background: #e5e7eb;
+        }
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="chat-card">
+            <div class="chat-header">
+                <h1 class="text-xl font-semibold text-white">Appointment Booking Assistant</h1>
+                <p class="text-sm text-indigo-100 mt-1">
+                    <span class="status-indicator"></span>
+                    Online
+                </p>
+                <i class="fas fa-calendar-check header-icon"></i>
+            </div>
+            
+            <div class="quick-replies">
+                <div class="quick-reply" onclick="sendQuickReply('I want to book an appointment')">Book Appointment</div>
+                <div class="quick-reply" onclick="sendQuickReply('What are your available times?')">Available Times</div>
+                <div class="quick-reply" onclick="sendQuickReply('Cancel appointment')">Cancel Appointment</div>
+            </div>
+            
+            <div class="chat-container overflow-y-auto p-4" id="chatContainer">
+                <div class="message bot-message">
+                    Hello! I'm your appointment booking assistant. How can I help you today?
+                    <div class="message-time">Just now</div>
+                </div>
+                <div class="typing-indicator" id="typingIndicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <form id="chatForm" class="flex gap-2 relative">
+                    <input type="text" 
+                           id="userInput" 
+                           class="input-field flex-1 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500"
+                           placeholder="Type your message here..."
+                           autocomplete="off">
+                    <button type="submit" 
+                            class="send-button text-white px-6 py-3 rounded-xl hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.textContent = message;
+            messageDiv.appendChild(messageContent);
+
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = getCurrentTime();
+            messageDiv.appendChild(timeDiv);
+
+            chatContainer.insertBefore(messageDiv, typingIndicator);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            userInput.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message }),
+                });
+
+                const data = await response.json();
+                hideTypingIndicator();
+                addMessage(data.response);
+
+                if (data.should_exit) {
+                    userInput.disabled = true;
+                    chatForm.querySelector('button').disabled = true;
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage('Sorry, there was an error processing your request.');
+            }
+        }
+
+        function sendQuickReply(message) {
+            userInput.value = message;
+            handleSubmit(new Event('submit'));
+        }
+
+        chatForm.addEventListener('submit', handleSubmit);
+
+        // Focus input on load
+        userInput.focus();
+    </script>
+</body>
+</html> 
