@@ -1,9 +1,5 @@
 # Appointment Booking Chatbot 🤖
 
-[![Python Version](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
-
 A Python-based appointment booking chatbot that helps businesses automate appointment scheduling with minimal deployment complexity.
 
 ## ✨ Features
@@ -81,26 +77,3 @@ Bot: Have a great day!
 - Database storage for appointments
 - Enhanced NLP capabilities
 - Integration with messaging platforms
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Authors
-
-- **Pranav Jahagirdar** - *Initial work* - [pranavjah](https://github.com/pranavjah)
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors who have helped shape this project
-- Inspired by the need for simple appointment scheduling solutions 
